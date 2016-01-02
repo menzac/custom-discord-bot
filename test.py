@@ -60,6 +60,6 @@ def execute_command(command, message):
     elif command[0] == "stats":
         commands.stats(command, message, data)
 
-data = deserialize_object("bodiky.data")
+data = deserialize_object("data.data")
 
 client.run()

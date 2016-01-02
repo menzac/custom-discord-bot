@@ -3,11 +3,14 @@
 import discord
 import pickle
 
+import commands
+from exceptions import ChatException
+
 MY_SERVER = "132560448775127041"
 bodiky = {}
 
 client = discord.Client()
-client.login('vojtin.j@gmail.com', 'Wn9z7EQq67rpUQFUZscY')
+client.login('vojtin.j@gmail.com', '1UsJt2kuMZfybArRkYtI')
 
 @client.event
 def on_ready():
@@ -20,7 +23,10 @@ def on_message(message):
     text = message.content.strip()
     if is_in_our_group(message):
         if text.startswith('!'):
-            execute_command(parse_command(text[1:]), message)
+          try:
+              execute_command(parse_command(text[1:]), message)
+          except ChatException as e:
+              send_message("Error: " + e.value, message.channel)
 
 def is_in_our_group(message):
     return message.server.id == MY_SERVER and \
@@ -38,22 +44,11 @@ def send_message(message, channel):
 
 def execute_command(command, message):
     members = [member.name.lower() for member in message.server.members]
+    commands.client = client
     if command[0] == "bodik":
-        try:
-            if command[1] in members:
-                bodiky[command[1]] = bodiky.get(command[1], 0) + 1
-                client.send_message(message.channel, str(bodiky.get(command[1], 0)))
-            else:
-                client.send_message(message.channel, "Tento user tady neni")
-        except IndexError:
-            client.send_message(message.channel, "Potrebuju jmeno komu mam dat bodik")
-    if command[0] == "stats":
-        try:
-            if command[1] in members:
-                client.send_message(message.channel, str(bodiky.get(command[1], 0)))
-            else:
-        except IndexError:
-            send_message("Potrebuju jmeno ci statistiky mam zobrazit", message.channel)
+        commands.bodik(command, message, bodiky)
+    elif command[0] == "stats":
+        commands.stats(command, message, bodiky)
 
 
 client.run()

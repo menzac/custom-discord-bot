@@ -17,6 +17,6 @@ def get_user_stats(data, user):
     data[user] = data.get(user, {})
     text = user + ":\n"
     for key in data[user].keys():
-       text += "   " str(key) + " = " + str(data[user][key]) + "\n"
+       text += "   " + str(key) + " = " + str(data[user][key]) + "\n"
     text += "\n"
     return text

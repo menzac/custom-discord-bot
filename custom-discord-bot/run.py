@@ -3,15 +3,19 @@
 import pickle
 
 from swear import count_swear_words
-from . import CommandBot
+from command_bot import CommandBot
+from swear_bot import SwearBot
+from stats import Stats
 
 
-client = CommandBot()
+stats = Stats()
+client = CommandBot(stats, {"trigger":"!"})
+client2 = SwearBot(stats)
 
 with open("login.data", 'r') as f:
     email, password = f.read().strip().split("\n")
     client.login(email, password)
-
+    client2.login(email, password)
 
 def serialize_object(object_, file_name):
     with open(file_name, 'wb') as f:
@@ -34,3 +38,4 @@ def execute_command(command, message):
         commands.stats(command, message, data)
 
 client.run()
+client2.run()

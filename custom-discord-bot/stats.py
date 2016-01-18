@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import collections
+from unidecode import unidecode
 
 class Stats(collections.MutableMapping):
     def __init__(self, *args, **kwargs):
@@ -9,18 +10,16 @@ class Stats(collections.MutableMapping):
         self.update(dict(*args, **kwargs))  # use the free update to set keys
 
     def __getitem__(self, key):
+        key = self._translate_key(key)
         if key not in self.users:
-            if key in _members:
-                self.users[key] = UserStats()
-            else:
-                raise MemberException("Není členem místnosti")
+            self.users[key] = UserStats()
         return self.users[key]
 
     def __setitem__(self, key, value):
-        self.users[key] = value
+        self.users[self._translate_key(key)] = value
 
     def __delitem__(self, key):
-        del self.users[key]
+        del self.users[self._translate_key(key)]
 
     def __iter__(self):
         return iter(self.users)
@@ -28,20 +27,30 @@ class Stats(collections.MutableMapping):
     def __len__(self):
         return len(self.users)
 
+    def _translate_key(self, key):
+        key = unidecode(key).lower()
+        if key in self._members:
+            return self._members[key]["id"]
+        else:
+            raise MemberException("Není členem místnosti")
+
     def set_members(self, members):
-        self._members = {member.lower():member for member in members}
+        self._members = { unidecode(member.name).lower():{"id": member.id,
+                                                    "name": member.name}
+                          for member in members}
 
     def get_all_stats_str(self):
         text = "```python\n"
-        for user in self.users:
-            text += "{0}: \n {1} \n".format(self._members[user],
-                                            self.users[user]._get_stats_str())
+        for user in self._members:
+            text += "{0}: \n {1} \n".format(
+                        self._members[user]["name"],
+                        self.__getitem__(user)._get_stats_str())
         text += "```"
         return text
 
     def get_user_stats_str(self, user):
         text = "```python\n"
-        text += self.users[user]._get_stats_str()
+        text += self.users[self._translate_key(user)]._get_stats_str()
         text += "```"
         return text
 

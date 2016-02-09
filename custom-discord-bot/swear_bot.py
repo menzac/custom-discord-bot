@@ -1,33 +1,30 @@
 # -*- coding: utf-8 -*-
 
-from discord import Client, utils
+import asyncio
 from stats import Stats, MemberException
 
-class SwearBot(Client):
+class SwearBot():
 
     def __init__(self, stats_):
-        Client.__init__(self)
         self.stats_ = stats_
         self.swear_words = self.build_swear_list()
 
     def on_message(self, msg):
-        self.stats_.set_members(msg.server.members)
 
         if msg.channel.is_private: return
         if not self._is_in_our_group(msg): return
 
+        text = msg.content.lower()
         try:
-            count = sum((msg.content.count(word) for word in self.swear_words))
+            count = sum((text.count(word) for word in self.swear_words))
             if count > 0:
-                self.stats_[msg.author]["sproste zpravy"] = 1
-                self.stats_[msg.author]["sproste slova"] += count
+                self.stats_[msg.author.name]["sproste zpravy"] = 1
+                self.stats_[msg.author.name]["sproste slova"] += count
         except MemberException as e:
-            self.send_message(msg.channel, e)
+            return e
 
     def on_ready(self):
-        print('Swear bot connected!')
-        print('Username: ' + self.user.name)
-        print('ID: ' + self.user.id)
+        print('Swear bot running!')
 
     def _is_in_our_group(self, msg):
         return msg.server.id == "132560448775127041" and \

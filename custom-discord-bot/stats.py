@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 
+import pickle
 import collections
 from unidecode import unidecode
 
 class Stats(collections.MutableMapping):
-    def __init__(self, *args, **kwargs):
-        self.users = dict()
+    def __init__(self, file_location, *args, **kwargs):
+        self.file_location = file_location
+        self._deserialize_object()
         self._members = {}
         self.update(dict(*args, **kwargs))  # use the free update to set keys
 
     def __getitem__(self, key):
         key = self._translate_key(key)
         if key not in self.users:
-            self.users[key] = UserStats()
+            self.users[key] = UserStats(self)
         return self.users[key]
 
     def __setitem__(self, key, value):
         self.users[self._translate_key(key)] = value
+        self._serialize_object(file_location)
 
     def __delitem__(self, key):
         del self.users[self._translate_key(key)]
@@ -42,7 +45,7 @@ class Stats(collections.MutableMapping):
     def get_all_stats_str(self):
         text = "```python\n"
         for user in self._members:
-            text += "{0}: \n {1} \n".format(
+            text += "{0}: \n{1} \n".format(
                         self._members[user]["name"],
                         self.__getitem__(user)._get_stats_str())
         text += "```"
@@ -54,10 +57,22 @@ class Stats(collections.MutableMapping):
         text += "```"
         return text
 
+    def serialize_object(self):
+        with open(self.file_location, 'wb') as f:
+            pickle.dump(self.users, f)
+
+    def _deserialize_object(self):
+        try:
+            with open(self.file_location, 'rb') as f:
+                self.users = pickle.load(f, encoding="utf-8")
+        except IOError:
+            self.users = dict()
+
 
 class UserStats(collections.MutableMapping):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         self.stats = dict()
+        self.parent = parent
         self.update(dict(*args, **kwargs))  # use the free update to set keys
 
     def __getitem__(self, key):
@@ -68,6 +83,7 @@ class UserStats(collections.MutableMapping):
 
     def __setitem__(self, key, value):
         self.stats[key] = value
+        self.parent.serialize_object()
 
     def __delitem__(self, key):
         del self.stats[key]

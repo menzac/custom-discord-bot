@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from discord import Client, utils
+import asyncio
 from stats import Stats, MemberException
 
 def command(func):
@@ -8,10 +8,9 @@ def command(func):
     return func
 
 
-class CommandBot(Client):
+class CommandBot():
 
     def __init__(self, stats_, config):
-        Client.__init__(self)
         self.config = config
         self.stats_ = stats_
         self.commands = []
@@ -35,14 +34,12 @@ class CommandBot(Client):
         if cmd not in self.commands: return
         func = getattr(self, cmd)
         try:
-            func(msg, arg)
+            return func(msg, arg)
         except MemberException as e:
-            self.send_message(msg.channel, e)
+            return e
 
     def on_ready(self):
-        print('Command bot connected!')
-        print('Username: ' + self.user.name)
-        print('ID: ' + self.user.id)
+        print('Command bot running!')
 
     def _is_in_our_group(self, msg):
         return msg.server.id == "132560448775127041" and \
@@ -55,13 +52,13 @@ class CommandBot(Client):
             if msg.author.name.lower() != arg:
                 self.stats_[arg]["bodik"] += 1
             else:
-                self.send_message(msg.channel, "Sám si dát bodík nemůžeš :(")
+                return "Sám si dát bodík nemůžeš :("
         else:
-            self.send_message(msg.channel, "Potřebuji jméno komu mám dat bodik")
+            return "Potřebuji jméno komu mám dat bodik"
 
     @command
     def stats(self, msg, arg):
         if arg is not None:
-            self.send_message(msg.channel, self.stats_.get_user_stats_str(arg))
+            return self.stats_.get_user_stats_str(arg)
         else:
-            self.send_message(msg.channel, self.stats_.get_all_stats_str())
+            return self.stats_.get_all_stats_str()

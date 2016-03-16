@@ -70,5 +70,5 @@ class CommandBot():
 
     @command
     def kappa(self, msg, arg):
-        return [("send_message", (msg.channel, "http://goo.gl/oi16FW")),
+        return [("send_message", (msg.channel, "http://i.imgur.com/cpzYXCI.png?1")),
                 ("delete_message", (msg,))]

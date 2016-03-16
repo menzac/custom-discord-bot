@@ -36,7 +36,7 @@ class CommandBot():
         try:
             return func(msg, arg)
         except MemberException as e:
-            return e
+            return [("send_message",(msg.channel, e))]
 
     def on_ready(self):
         print('Command bot running!')
@@ -52,13 +52,23 @@ class CommandBot():
             if msg.author.name.lower() != arg:
                 self.stats_[arg]["bodik"] += 1
             else:
-                return "Sám si dát bodík nemůžeš :("
+                return [("send_message",(msg.channel, "Sám si dát bodík nemůžeš :("))]
         else:
-            return "Potřebuji jméno komu mám dat bodik"
+            return [("send_message",(msg.channel, "Potřebuji jméno komu mám dat bodik"))]
 
     @command
     def stats(self, msg, arg):
         if arg is not None:
-            return self.stats_.get_user_stats_str(arg)
+            return [("send_message",(msg.channel, self.stats_.get_user_stats_str(arg)))]
         else:
-            return self.stats_.get_all_stats_str()
+            return [("send_message",(msg.channel, self.stats_.get_all_stats_str()))]
+
+    @command
+    def franta(self, msg, arg):
+        return [("send_message", (msg.channel, "http://goo.gl/NpHh9C")),
+                ("delete_message", (msg,))]
+
+    @command
+    def kappa(self, msg, arg):
+        return [("send_message", (msg.channel, "http://goo.gl/oi16FW")),
+                ("delete_message", (msg,))]

@@ -18,7 +18,7 @@ class SwearBot():
         try:
             count = sum((text.count(word) for word in self.swear_words))
             if count > 0:
-                self.stats_[msg.author.name]["sproste zpravy"] = 1
+                self.stats_[msg.author.name]["sproste zpravy"] += 1
                 self.stats_[msg.author.name]["sproste slova"] += count
         except MemberException as e:
             return e

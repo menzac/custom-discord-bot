@@ -5,8 +5,8 @@ import collections
 from unidecode import unidecode
 
 class Stats(collections.MutableMapping):
-    def __init__(self, file_location, *args, **kwargs):
-        self.file_location = file_location
+    def __init__(self, config, *args, **kwargs):
+        self.file_location = config["stats_location"]
         self._deserialize_object()
         self._members = {}
         self.update(dict(*args, **kwargs))  # use the free update to set keys

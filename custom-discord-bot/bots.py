@@ -5,12 +5,10 @@ from discord import Client
 
 class Bots(Client):
 
-
-
     def __init__(self, bots):
-        self.bots = bots
         Client.__init__(self)
-        operations = [self.send_message, self.delete_message]
+        self.bots = bots
+        operations = [self.send_message, self.send_file, self.delete_message]
         self.operations = {op.__name__:op for op in operations}
 
     @asyncio.coroutine
@@ -19,9 +17,9 @@ class Bots(Client):
             func = getattr(bot, "on_message", None)
             if callable(func):
                 reactions = func(msg)
-                if reactions is None: return
+                if reactions is None: continue
                 for reaction in reactions:
-                    yield from self.operations[reaction[0]](*reaction[1])
+                    yield from self.operations[reaction[0]](*reaction[1], **reaction[2])
 
     @asyncio.coroutine
     def on_ready(self):

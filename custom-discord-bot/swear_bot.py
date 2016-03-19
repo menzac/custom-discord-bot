@@ -5,12 +5,12 @@ from stats import Stats, MemberException
 
 class SwearBot():
 
-    def __init__(self, stats_):
+    def __init__(self, stats_, config):
+        self.config = config
         self.stats_ = stats_
         self.swear_words = self.build_swear_list()
 
     def on_message(self, msg):
-
         if msg.channel.is_private: return
         if not self._is_in_our_group(msg): return
 
@@ -27,9 +27,8 @@ class SwearBot():
         print('Swear bot running!')
 
     def _is_in_our_group(self, msg):
-        return msg.server.id == "132560448775127041" and \
-               msg.channel.name in ("lol", "test") and \
-               not msg.channel.is_private
+        return msg.server.id == self.config["server_id"] and \
+            msg.channel.name in ("lol", "test")
 
     def build_swear_list(self):
         with open("../swear/cs", encoding="utf-8") as cs, \

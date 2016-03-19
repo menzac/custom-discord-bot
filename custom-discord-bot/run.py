@@ -1,15 +1,23 @@
+#! /usr/bin/python3.4
 # -*- coding: utf-8 -*-
 
 from command_bot import CommandBot
 from swear_bot import SwearBot
+from loging_bot import LogingBot
 from bots import Bots
 from stats import Stats
 
+config = {"trigger":"!",
+          "images_location": "../images/{}.png",
+          "stats_location": "/home/slepice1/data.data",
+          "server_id": "132560448775127041",
+          "channels": ("lol", "test")}
 
-stats = Stats("/home/slepice1/data.data")
-command_bot = CommandBot(stats, {"trigger":"!"})
-swear_bot = SwearBot(stats)
-bots = Bots([command_bot, swear_bot])
+stats = Stats(config)
+command_bot = CommandBot(stats, config)
+swear_bot = SwearBot(stats, config)
+loging_bot = LogingBot(config)
+bots = Bots([command_bot, swear_bot, loging_bot])
 
 with open("login.data", 'r') as f:
     email, password = f.read().strip().split("\n")

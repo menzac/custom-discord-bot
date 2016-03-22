@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import asyncio
 from stats import Stats, MemberException
 
@@ -35,7 +36,7 @@ class CommandBot():
         try:
             return func(msg, arg)
         except MemberException as e:
-            return [("send_message",(msg.channel, e), {})]
+            return [("send_message",(msg.channel, e))]
 
     def on_ready(self):
         print('Command bot running!')
@@ -50,20 +51,23 @@ class CommandBot():
             if msg.author.name.lower() != arg:
                 self.stats_[arg]["bodik"] += 1
             else:
-                return [("send_message",(msg.channel, "Sám si dát bodík nemůžeš :("), {})]
+                return [("send_message",(msg.channel, "Sám si dát bodík nemůžeš :frowning:"))]
         else:
-            return [("send_message",(msg.channel, "Potřebuji jméno komu mám dat bodik"), {})]
+            return [("send_message",(msg.channel, "Potřebuji jméno komu mám dat bodik"))]
 
     @command
     def stats(self, msg, arg):
         if arg is not None:
-            return [("send_message",(msg.channel, self.stats_.get_user_stats_str(arg)),{})]
+            return [("send_message",(msg.channel, self.stats_.get_user_stats_str(arg)))]
         else:
-            return [("send_message",(msg.channel, self.stats_.get_all_stats_str()),{})]
+            return [("send_message",(msg.channel, self.stats_.get_all_stats_str()))]
 
     @command
     def react(self, msg, arg):
         arg = arg.replace(".","").replace("/","")
-        file_name = self.config["images_location"].format(arg)
-        return [("send_file", (msg.channel, file_name), {"content":msg.author.name}),
-                ("delete_message", (msg,), {})]
+        for location in self.config["images_locations"]:
+            file_name = location.format(arg)
+            if os.path.isfile(file_name):
+                return [("send_file", (msg.channel, file_name), {"content":msg.author.name}),
+                        ("delete_message", (msg,))]
+        return [("send_message",(msg.channel, "Tato reakce neexistuje :frowning:"))]

@@ -19,7 +19,10 @@ class Bots(Client):
                 reactions = func(msg)
                 if reactions is None: continue
                 for reaction in reactions:
-                    yield from self.operations[reaction[0]](*reaction[1], **reaction[2])
+                    if len(reaction) < 3:
+                        yield from self.operations[reaction[0]](*reaction[1])
+                    else:
+                        yield from self.operations[reaction[0]](*reaction[1], **reaction[2])
 
     @asyncio.coroutine
     def on_ready(self):

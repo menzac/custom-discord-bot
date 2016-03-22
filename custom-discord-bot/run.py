@@ -8,7 +8,7 @@ from bots import Bots
 from stats import Stats
 
 config = {"trigger":"!",
-          "images_location": "../images/{}.png",
+          "images_locations": ("../images/{}.png", "../images/{}.gif"),
           "stats_location": "/home/slepice1/data.data",
           "server_id": "132560448775127041",
           "channels": ("lol", "test")}
